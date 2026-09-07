@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Tracker — A better way to track your job applications</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#B7C179;
+    --accent-dark:#94A15A;
+    --accent-tint:#F3F5E7;
+    --ink:#1B1D29;
+    --muted:#70738A;
+    --border:#E7E6EF;
+    --bg:#FFFFFF;
+    --panel:#FAFAF7;
+    --ease:cubic-bezier(.22,1,.36,1);
+
+    --wishlist:#2E90FA;
+    --applied:#7A5AF8;
+    --interviewing:#12B76A;
+    --offer:#F5A524;
+    --rejected:#EF4444;
+    --tag-bg:#EAF1FF;
+    --tag-ink:#2E5AAC;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(680px 420px at 12% 0%, rgba(183,193,121,0.18), transparent 60%),
+      radial-gradient(600px 380px at 88% 8%, rgba(148,161,90,0.12), transparent 55%),
+      var(--bg);
+    overflow-x:hidden;
+  }
+  a{ color:inherit; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+
+  /* ---------- nav ---------- */
+  .nav{
+    position:sticky;
+    top:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 48px;
+    background:rgba(255,255,255,0.55);
+    backdrop-filter:blur(16px) saturate(160%);
+    -webkit-backdrop-filter:blur(16px) saturate(160%);
+    border-bottom:1px solid rgba(255,255,255,0.5);
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-family:'Sora',sans-serif;
+    font-weight:700;
+    font-size:19px;
+    text-decoration:none;
+    color:var(--ink);
+  }
+  .nav-right{ display:flex; align-items:center; gap:24px; }
+  .nav-link{ font-size:14.5px; font-weight:500; color:var(--ink); text-decoration:none; position:relative; }
+  .nav-link::after{
+    content:'';
+    position:absolute;
+    left:0; right:0; bottom:-4px;
+    height:2px;
+    background:var(--accent);
+    transform:scaleX(0);
+    transform-origin:left;
+    transition:transform .3s var(--ease);
+  }
+  .nav-link:hover::after{ transform:scaleX(1); }
+  .nav-cta{
+    background:var(--accent);
+    color:#fff;
+    padding:9px 18px;
+    border-radius:9px;
+    font-size:14.5px;
+    font-weight:700;
+    text-decoration:none;
+    transition:background .3s var(--ease), transform .2s var(--ease), box-shadow .3s var(--ease);
+  }
+  .nav-cta:hover{ background:var(--accent-dark); transform:translateY(-1px); box-shadow:0 8px 18px -8px rgba(124,137,64,0.55); }
+  .nav-cta:active{ transform:translateY(0) scale(.97); }
+
+  /* ---------- hero ---------- */
+  .hero{
+    max-width:800px;
+    margin:0 auto;
+    padding:100px 24px 0;
+    text-align:center;
+    position:relative;
+  }
+  .hero .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    background:rgba(255,255,255,0.5);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.7);
+    box-shadow:0 4px 16px -8px rgba(148,161,90,0.35);
+    color:var(--accent-dark);
+    font-size:13px;
+    font-weight:600;
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:22px;
+    opacity:0;
+    animation:riseIn .6s var(--ease) forwards;
+  }
+  .hero .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); }
+  .hero h1{
+    font-family:'Sora',sans-serif;
+    font-size:54px;
+    line-height:1.14;
+    font-weight:700;
+    margin:0 0 20px;
+    letter-spacing:-0.5px;
+    opacity:0;
+    animation:riseIn .7s var(--ease) forwards;
+    animation-delay:.08s;
+  }
+  .hero p.lede{
+    font-size:18px;
+    color:var(--muted);
+    margin:0 0 34px;
+    line-height:1.6;
+    max-width:600px;
+    margin-left:auto;
+    margin-right:auto;
+    opacity:0;
+    animation:riseIn .7s var(--ease) forwards;
+    animation-delay:.16s;
+  }
+  .hero-actions{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    opacity:0;
+    animation:riseIn .7s var(--ease) forwards;
+    animation-delay:.24s;
+  }
+  .hero-cta{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    background:var(--accent);
+    color:#fff;
+    text-decoration:none;
+    padding:15px 26px;
+    border-radius:12px;
+    font-weight:700;
+    font-size:16px;
+    transition:background .3s var(--ease), transform .2s var(--ease), box-shadow .3s var(--ease);
+  }
+  .hero-cta:hover{ background:var(--accent-dark); transform:translateY(-2px); box-shadow:0 14px 26px -12px rgba(124,137,64,.55); }
+  .hero-cta:active{ transform:translateY(0) scale(.98); }
+  .hero-cta svg{ transition:transform .3s var(--ease); }
+  .hero-cta:hover svg{ transform:translateX(3px); }
+
+  .hero-secondary{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    color:var(--ink);
+    text-decoration:none;
+    font-weight:600;
+    font-size:15px;
+    padding:15px 6px;
+    transition:color .25s ease;
+  }
+  .hero-secondary:hover{ color:var(--accent-dark); }
+
+  .hero-note{
+    margin:18px 0 6px;
+    font-size:13.5px;
+    color:var(--muted);
+    opacity:0;
+    animation:riseIn .7s var(--ease) forwards;
+    animation-delay:.3s;
+  }
+  .hero-demo{
+    font-size:13px;
+    color:#9C9FB2;
+    font-style:italic;
+    opacity:0;
+    animation:riseIn .7s var(--ease) forwards;
+    animation-delay:.34s;
+  }
+
+  @keyframes riseIn{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* ---------- stats strip ---------- */
+  .stats{
+    max-width:820px;
+    margin:64px auto 0;
+    padding:0 24px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    text-align:center;
+  }
+  .stat{
+    padding:20px 8px;
+    background:rgba(255,255,255,0.45);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.65);
+    border-radius:16px;
+    box-shadow:0 10px 26px -18px rgba(27,29,41,0.25);
+  }
+  .stat .num{ font-family:'Sora',sans-serif; font-size:28px; font-weight:700; color:var(--ink); display:block; }
+  .stat .label{ font-size:12.5px; color:var(--muted); margin-top:4px; }
+
+  /* ---------- tabs + preview ---------- */
+  .tabs{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin:78px 0 22px;
+    flex-wrap:wrap;
+    padding:0 20px;
+  }
+  .tab{
+    border:1px solid rgba(255,255,255,0.6);
+    background:rgba(255,255,255,0.45);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    color:var(--muted);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:10px 18px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .3s var(--ease), color .3s var(--ease), transform .2s var(--ease);
+  }
+  .tab:hover{ transform:translateY(-1px); }
+  .tab.active{ background:rgba(183,193,121,0.85); color:#fff; border-color:rgba(255,255,255,0.5); }
+  .tab-caption{
+    text-align:center;
+    font-size:14px;
+    color:var(--muted);
+    margin:0 0 30px;
+    min-height:20px;
+    transition:opacity .25s ease;
+  }
+
+  .board-frame{
+    max-width:1080px;
+    margin:0 auto 40px;
+    padding:0 24px;
+  }
+  .board-window{
+    border:1px solid var(--border);
+    border-radius:18px;
+    box-shadow:0 30px 70px -30px rgba(27,29,41,0.28);
+    overflow:hidden;
+    background:#fff;
+  }
+  .board-topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 24px;
+    border-bottom:1px solid var(--border);
+  }
+  .board-topbar .brand{ font-size:15px; }
+  .board-topbar .brand svg{ width:17px; height:17px; }
+  .board-topbar-right{ display:flex; align-items:center; gap:14px; font-size:13px; color:var(--muted); font-weight:500; }
+  .avatar{
+    width:26px; height:26px; border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700;
+  }
+
+  .board-header{ padding:22px 26px 6px; }
+  .board-header h2{ margin:0 0 4px; font-family:'Sora',sans-serif; font-size:19px; }
+  .board-header p{ margin:0; font-size:13.5px; color:var(--muted); }
+
+  .preview-stage{
+    position:relative;
+    height:600px;
+    overflow:hidden;
+  }
+  .preview-panel{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transform:translateY(10px) scale(.995);
+    transition:opacity .45s var(--ease), transform .45s var(--ease);
+    pointer-events:none;
+  }
+  .preview-panel.active{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    pointer-events:auto;
+  }
+
+  .columns{
+    display:flex;
+    gap:14px;
+    padding:18px 26px 26px;
+    overflow-x:auto;
+    height:calc(100% - 78px);
+  }
+  .col{
+    flex:1 1 210px;
+    min-width:210px;
+    background:var(--panel);
+    border-radius:12px;
+    border:1px solid var(--border);
+    padding-bottom:10px;
+    height:fit-content;
+  }
+  .col-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 12px;
+    border-radius:12px 12px 0 0;
+    color:#fff;
+    font-size:12.5px;
+    font-weight:700;
+  }
+  .col-head .count{ background:rgba(255,255,255,0.28); padding:1px 7px; border-radius:999px; font-size:11px; }
+  .col[data-status="wishlist"] .col-head{ background:var(--wishlist); }
+  .col[data-status="applied"] .col-head{ background:var(--applied); }
+  .col[data-status="interviewing"] .col-head{ background:var(--interviewing); }
+  .col[data-status="offer"] .col-head{ background:var(--offer); }
+  .col[data-status="rejected"] .col-head{ background:var(--rejected); }
+
+  .job-card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:11px 12px;
+    margin:9px 10px 0;
+    font-size:12.5px;
+    box-shadow:0 1px 2px rgba(27,29,41,0.04);
+    transition:box-shadow .3s var(--ease), transform .3s var(--ease);
+  }
+  .job-card:hover{ box-shadow:0 8px 18px -10px rgba(27,29,41,0.22); transform:translateY(-1px); }
+  .job-card .role{ font-weight:700; color:var(--ink); display:block; margin-bottom:1px; }
+  .job-card .company{ color:var(--muted); font-size:11.5px; display:block; margin-bottom:5px; }
+  .job-card .desc{ color:var(--muted); font-size:11px; line-height:1.4; display:block; margin-bottom:7px; }
+  .job-card .tags{ display:flex; flex-wrap:wrap; gap:4px; }
+  .job-card .tag{ background:var(--tag-bg); color:var(--tag-ink); font-size:10.5px; font-weight:600; padding:2px 8px; border-radius:999px; }
+
+  .add-job{
+    margin:10px 10px 0;
+    padding:8px 10px;
+    border:1.4px dashed var(--border);
+    border-radius:9px;
+    background:transparent;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    text-align:left;
+    width:calc(100% - 20px);
+    transition:border-color .25s ease, color .25s ease;
+  }
+  .add-job:hover{ border-color:var(--accent); color:var(--accent-dark); }
+
+  /* manage-boards modal preview */
+  .modal-scrim{
+    position:absolute;
+    inset:0;
+    background:rgba(27,29,41,0.45);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .modal-card{
+    background:#fff;
+    border-radius:16px;
+    width:440px;
+    max-width:100%;
+    max-height:100%;
+    overflow-y:auto;
+    padding:26px 26px 22px;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.35);
+  }
+  .modal-card h3{ font-family:'Sora',sans-serif; font-size:17px; margin:0 0 3px; }
+  .modal-card .sub{ font-size:12.5px; color:var(--muted); margin:0 0 18px; }
+  .modal-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+  .modal-field label{ display:block; font-size:11.5px; font-weight:600; margin-bottom:5px; }
+  .modal-field input, .modal-field textarea{
+    width:100%;
+    border:1.4px solid var(--border);
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:12.5px;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:#FCFCFE;
+    resize:none;
+  }
+  .modal-field input:focus, .modal-field textarea:focus{
+    outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-tint);
+  }
+  .modal-full{ margin-bottom:12px; }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:6px; }
+  .modal-btn-ghost{ background:none; border:1.4px solid var(--border); padding:8px 16px; border-radius:8px; font-weight:600; font-size:12.5px; cursor:pointer; color:var(--muted); }
+  .modal-btn-primary{ background:var(--accent); border:none; padding:8px 18px; border-radius:8px; font-weight:700; font-size:12.5px; cursor:pointer; color:#fff; transition:background .25s ease; }
+  .modal-btn-primary:hover{ background:var(--accent-dark); }
+
+  /* ---------- how it works ---------- */
+  .how{
+    max-width:980px;
+    margin:0 auto;
+    padding:20px 24px 100px;
+  }
+  .how-head{ text-align:center; margin-bottom:48px; }
+  .how-head h2{ font-family:'Sora',sans-serif; font-size:30px; margin:0 0 10px; }
+  .how-head p{ color:var(--muted); font-size:15px; margin:0; }
+  .how-steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:36px; }
+  .how-step{ position:relative; padding-left:0; }
+  .how-step .idx{
+    font-family:'Sora',sans-serif;
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent-dark);
+    background:var(--accent-tint);
+    width:30px; height:30px;
+    border-radius:9px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:16px;
+  }
+  .how-step h3{ font-family:'Sora',sans-serif; font-size:16.5px; margin:0 0 8px; }
+  .how-step p{ font-size:13.5px; color:var(--muted); line-height:1.6; margin:0; }
+
+  /* ---------- features ---------- */
+  .features-wrap{
+    position:relative;
+    background:linear-gradient(180deg, #F6F7EF 0%, #EFF1E3 100%);
+    border-top:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+    overflow:hidden;
+  }
+  .features-wrap::before, .features-wrap::after{
+    content:'';
+    position:absolute;
+    border-radius:50%;
+    filter:blur(60px);
+    z-index:0;
+  }
+  .features-wrap::before{
+    width:340px; height:340px;
+    background:rgba(183,193,121,0.35);
+    top:-100px; left:-80px;
+  }
+  .features-wrap::after{
+    width:300px; height:300px;
+    background:rgba(148,161,90,0.22);
+    bottom:-90px; right:-60px;
+  }
+  .features{
+    position:relative;
+    z-index:1;
+    max-width:1040px;
+    margin:0 auto;
+    padding:88px 24px;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:40px 44px;
+  }
+  .feature{
+    background:rgba(255,255,255,0.55);
+    backdrop-filter:blur(16px) saturate(160%);
+    -webkit-backdrop-filter:blur(16px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.7);
+    border-radius:14px;
+    padding:26px 24px;
+    transition:transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
+  }
+  .feature:hover{ transform:translateY(-3px); box-shadow:0 16px 32px -18px rgba(27,29,41,0.22); border-color:rgba(255,255,255,0.9); }
+  .feature-icon{
+    width:42px; height:42px;
+    border-radius:11px;
+    background:rgba(255,255,255,0.6);
+    backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:16px;
+  }
+  .feature h3{
+    font-family:'Sora',sans-serif;
+    font-size:16.5px;
+    margin:0 0 8px;
+  }
+  .feature p{
+    font-size:13.5px;
+    color:var(--muted);
+    line-height:1.6;
+    margin:0;
+  }
+
+  /* ---------- faq ---------- */
+  .faq{
+    max-width:720px;
+    margin:0 auto;
+    padding:96px 24px;
+  }
+  .faq-head{ text-align:center; margin-bottom:40px; }
+  .faq-head h2{ font-family:'Sora',sans-serif; font-size:30px; margin:0 0 10px; }
+  .faq-head p{ color:var(--muted); font-size:15px; margin:0; }
+  .faq-item{ border-bottom:1px solid var(--border); }
+  .faq-q{
+    width:100%;
+    background:none;
+    border:none;
+    text-align:left;
+    padding:20px 4px;
+    font-family:'Inter',sans-serif;
+    font-size:15.5px;
+    font-weight:600;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+    gap:16px;
+  }
+  .faq-q svg{ flex-shrink:0; transition:transform .35s var(--ease); stroke:var(--muted); }
+  .faq-item.open .faq-q svg{ transform:rotate(45deg); stroke:var(--accent-dark); }
+  .faq-a{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .4s var(--ease), opacity .3s ease;
+    opacity:0;
+    font-size:14px;
+    color:var(--muted);
+    line-height:1.65;
+    padding:0 4px;
+  }
+  .faq-item.open .faq-a{ max-height:200px; opacity:1; padding-bottom:20px; }
+
+  /* ---------- final cta ---------- */
+  .final-cta{
+    position:relative;
+    max-width:900px;
+    margin:0 auto 100px;
+    padding:64px 48px;
+    background:linear-gradient(155deg, rgba(183,193,121,0.9) 0%, rgba(148,161,90,0.92) 100%);
+    backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,0.35);
+    border-radius:22px;
+    text-align:center;
+    color:#fff;
+    overflow:hidden;
+  }
+  .final-cta::before{
+    content:'';
+    position:absolute;
+    width:260px; height:260px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.16);
+    top:-120px; right:-60px;
+    filter:blur(2px);
+  }
+  .final-cta h2{ position:relative; z-index:1; font-family:'Sora',sans-serif; font-size:30px; margin:0 0 12px; }
+  .final-cta p{ position:relative; z-index:1; font-size:15px; color:rgba(255,255,255,0.85); margin:0 0 28px; }
+  .final-cta .hero-cta{ position:relative; z-index:1; background:#fff; color:var(--accent-dark); }
+  .final-cta .hero-cta:hover{ background:#F5F6EF; box-shadow:0 14px 26px -12px rgba(0,0,0,.35); }
+
+  /* ---------- footer ---------- */
+  .footer{
+    border-top:1px solid var(--border);
+    padding:44px 48px 30px;
+  }
+  .footer-top{
+    display:flex;
+    justify-content:space-between;
+    gap:40px;
+    flex-wrap:wrap;
+    max-width:1080px;
+    margin:0 auto 28px;
+  }
+  .footer-col h4{ font-size:12.5px; text-transform:none; color:var(--ink); margin:0 0 12px; font-weight:700; }
+  .footer-col a{ display:block; font-size:13.5px; color:var(--muted); text-decoration:none; margin-bottom:9px; transition:color .2s ease; }
+  .footer-col a:hover{ color:var(--accent-dark); }
+  .footer-bottom{
+    max-width:1080px;
+    margin:0 auto;
+    padding-top:22px;
+    border-top:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-size:13px;
+    color:var(--muted);
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  @media (max-width:900px){
+    .stats{ grid-template-columns:repeat(2,1fr); }
+    .how-steps{ grid-template-columns:1fr; gap:28px; }
+    .features{ grid-template-columns:1fr; }
+    .modal-grid{ grid-template-columns:1fr; }
+  }
+  @media (max-width:760px){
+    .nav{ padding:16px 20px; }
+    .hero{ padding:64px 20px 0; }
+    .hero h1{ font-size:34px; }
+    .preview-stage{ height:auto; min-height:640px; }
+    .final-cta{ padding:44px 26px; margin-left:16px; margin-right:16px; }
+    .footer{ padding:36px 20px 24px; }
+    .footer-bottom{ flex-direction:column; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="brand" href="landing.html">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="13" rx="2" stroke="#B7C179" stroke-width="1.8"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7" stroke="#B7C179" stroke-width="1.8"/><path d="M3 12h18" stroke="#B7C179" stroke-width="1.8"/></svg>
+      Job Tracker
+    </a>
+    <div class="nav-right">
+      <a class="nav-link" href="auth-card.html#login">Log In</a>
+      <a class="nav-cta" href="auth-card.html">Start for Free</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <span class="eyebrow"><span class="dot"></span>Built for the modern job search</span>
+    <h1>A better way to track your job applications</h1>
+    <p class="lede">Capture, organize and manage your job search in one place — from the first application to a signed offer, without a messy spreadsheet.</p>
+    <div class="hero-actions">
+      <a class="hero-cta" href="auth-card.html">
+        Start for free
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="hero-secondary" href="#preview">See how it works</a>
+    </div>
+    <p class="hero-note">Free forever. No credit card required.</p>
+    <p class="hero-demo">For demo use aliflodithree@gmail.com / aliflodi</p>
+  </section>
+
+  <div class="stats">
+    <div class="stat"><span class="num">5</span><span class="label">Pipeline stages</span></div>
+    <div class="stat"><span class="num">∞</span><span class="label">Boards you can run</span></div>
+    <div class="stat"><span class="num">0s</span><span class="label">Setup time</span></div>
+    <div class="stat"><span class="num">$0</span><span class="label">Cost to start</span></div>
+  </div>
+
+  <div id="preview"></div>
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="organize">Organize Applications</button>
+    <button class="tab" data-tab="hired">Get Hired</button>
+    <button class="tab" data-tab="manage">Manage Boards</button>
+  </div>
+  <p class="tab-caption" id="tabCaption">Every application lives on one board, sorted into the stages that matter to you.</p>
+
+  <div class="board-frame">
+    <div class="board-window">
+      <div class="board-topbar">
+        <div class="brand">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="13" rx="2" stroke="#B7C179" stroke-width="1.8"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7" stroke="#B7C179" stroke-width="1.8"/><path d="M3 12h18" stroke="#B7C179" stroke-width="1.8"/></svg>
+          Job Tracker
+        </div>
+        <div class="board-topbar-right">
+          Dashboard
+          <span class="avatar">J</span>
+        </div>
+      </div>
+
+      <div class="board-header">
+        <h2>Job Hunt</h2>
+        <p>Track your job applications</p>
+      </div>
+
+      <div class="preview-stage">
+
+        <!-- TAB 1: organize — board with real cards -->
+        <div class="preview-panel active" data-panel="organize">
+          <div class="columns">
+            <div class="col" data-status="wishlist">
+              <div class="col-head"><span>Wish List</span><span class="count">2</span></div>
+              <div class="job-card">
+                <span class="role">Product Designer</span>
+                <span class="company">Airbnb</span>
+              </div>
+              <div class="job-card">
+                <span class="role">Data Analyst</span>
+                <span class="company">Duolingo</span>
+              </div>
+              <button class="add-job">+ Add Job</button>
+            </div>
+            <div class="col" data-status="applied">
+              <div class="col-head"><span>Applied</span><span class="count">2</span></div>
+              <div class="job-card">
+                <span class="role">Backend Engineer</span>
+                <span class="company">Shopify</span>
+              </div>
+              <div class="job-card">
+                <span class="role">UX Researcher</span>
+                <span class="company">Figma</span>
+              </div>
+              <button class="add-job">+ Add Job</button>
+            </div>
+            <div class="col" data-status="interviewing">
+              <div class="col-head"><span>Interviewing</span><span class="count">1</span></div>
+              <div class="job-card">
+                <span class="role">Software Engineer</span>
+                <span class="company">Vercel</span>
+              </div>
+              <button class="add-job">+ Add Job</button>
+            </div>
+            <div class="col" data-status="offer">
+              <div class="col-head"><span>Offer</span><span class="count">1</span></div>
+              <div class="job-card">
+                <span class="role">Full-stack Developer</span>
+                <span class="company">Ramp</span>
+              </div>
+              <button class="add-job">+ Add Job</button>
+            </div>
+            <div class="col" data-status="rejected">
+              <div class="col-head"><span>Rejected</span><span class="count">1</span></div>
+              <div class="job-card">
+                <span class="role">Growth Marketer</span>
+                <span class="company">Dropbox</span>
+              </div>
+              <button class="add-job">+ Add Job</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: get hired — full cards with tags -->
+        <div class="preview-panel" data-panel="hired">
+          <div class="columns">
+            <div class="col" data-status="wishlist">
+              <div class="col-head"><span>Wish List</span><span class="count">2</span></div>
+              <div class="job-card">
+                <span class="role">Software Developer</span>
+                <span class="company">MU Company</span>
+                <span class="desc">Build modern web applications using React and Tailwind CSS</span>
+                <span class="tags"><span class="tag">React</span><span class="tag">Tailwind</span><span class="tag">High Pay</span></span>
+              </div>
+              <div class="job-card">
+                <span class="role">Front End Developer</span>
+                <span class="company">Stripe</span>
+                <span class="desc">Work on payment infrastructure frontend</span>
+                <span class="tags"><span class="tag">TypeScript</span><span class="tag">React</span><span class="tag">Next.js</span></span>
+              </div>
+              <button class="add-job">+ Add Job</button>
+            </div>
+            <div class="col" data-status="applied">
+              <div class="col-head"><span>Applied</span><span class="count">2</span></div>
+              <div class="job-card">
+                <span class="role">DevOps Engineer</span>
+                <span class="company">LeaFood</span>
+                <span class="desc">Manage infrastructure and deployment pipelines</span>
+                <span class="tags"><span class="tag">promQL</span><span class="tag">Full-stack</span><span class="tag">Docker</span></span>
+              </div>
+              <div class="job-card">
+                <span class="role">Mobile Developer</span>
+                <span class="company">Nomura</span>
+                <span class="desc">Develop mobile applications for financial services</span>
+                <span class="tags"><span class="tag">React Native</span><span class="tag">iOS</span><span class="tag">Android</span></span>
+              </div>
+              <button class="add-job">+ Add Job</button>
+            </div>
+            <div class="col" data-status="interviewing">
+              <div class="col-head"><span>Interviewing</span><span class="count">2</span></div>
+              <div class="job-card">
+                <span class="role">Web Designer</span>
+                <span class="company">Retromotion</span>
+                <span class="desc">Create responsive web designs and implement them</span>
+                <span class="tags"><span class="tag">Figma</span><span class="tag">React</span><span class="tag">Bootstrap</span></span>
+              </div>
+              <div class="job-card">
+                <span class="role">Product Manager</span>
+                <span class="company">WorkLab</span>
+                <span class="desc">Help drive the product and business planning for our platform</span>
+                <span class="tags"><span class="tag">Product Strategy</span><span class="tag">Agile</span><span class="tag">Analytics</span></span>
+              </div>
+              <button class="add-job">+ Add Job</button>
+            </div>
+            <div class="col" data-status="offer">
+              <div class="col-head"><span>Offer</span><span class="count">1</span></div>
+              <div class="job-card">
+                <span class="role">Full-stack Developer</span>
+                <span class="company">Ramp</span>
+                <span class="desc">Own end-to-end features across our web app</span>
+                <span class="tags"><span class="tag">Node.js</span><span class="tag">React</span><span class="tag">GraphQL</span></span>
+              </div>
+              <button class="add-job">+ Add Job</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: manage boards — add job modal -->
+        <div class="preview-panel" data-panel="manage">
+          <div class="columns" style="filter:blur(1.5px); opacity:.7;">
+            <div class="col" data-status="wishlist">
+              <div class="col-head"><span>Wish List</span><span class="count">2</span></div>
+              <div class="job-card">
+                <span class="role">Software Developer</span>
+                <span class="company">MU Company</span>
+              </div>
+              <div class="job-card">
+                <span class="role">Front End Developer</span>
+                <span class="company">Stripe</span>
+              </div>
+            </div>
+            <div class="col" data-status="applied">
+              <div class="col-head"><span>Applied</span><span class="count">2</span></div>
+              <div class="job-card">
+                <span class="role">DevOps Engineer</span>
+                <span class="company">LeaFood</span>
+              </div>
+            </div>
+            <div class="col" data-status="interviewing">
+              <div class="col-head"><span>Interviewing</span><span class="count">2</span></div>
+              <div class="job-card">
+                <span class="role">Web Designer</span>
+                <span class="company">Retromotion</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-scrim">
+            <div class="modal-card">
+              <h3>Add Job Application</h3>
+              <p class="sub">Track a new job application</p>
+              <div class="modal-grid">
+                <div class="modal-field"><label>Company *</label><input type="text" placeholder="" disabled></div>
+                <div class="modal-field"><label>Position *</label><input type="text" placeholder="" disabled></div>
+              </div>
+              <div class="modal-grid">
+                <div class="modal-field"><label>Location</label><input type="text" placeholder="" disabled></div>
+                <div class="modal-field"><label>Salary</label><input type="text" placeholder="e.g., $100k – $150k" disabled></div>
+              </div>
+              <div class="modal-field modal-full"><label>Job URL</label><input type="text" placeholder="https://..." disabled></div>
+              <div class="modal-field modal-full"><label>Tags (comma-separated)</label><input type="text" placeholder="React, Tailwind, High Pay" disabled></div>
+              <div class="modal-field modal-full"><label>Description</label><textarea rows="2" placeholder="Brief description of the role..." disabled></textarea></div>
+              <div class="modal-field modal-full"><label>Notes</label><textarea rows="2" disabled></textarea></div>
+              <div class="modal-actions">
+                <button class="modal-btn-ghost" type="button">Cancel</button>
+                <button class="modal-btn-primary" type="button">Add Application</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <section class="how">
+    <div class="how-head">
+      <h2>From application to offer in three steps</h2>
+      <p>No setup guides to read. Open a board and start dropping in roles.</p>
+    </div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="idx">1</div>
+        <h3>Add the role</h3>
+        <p>Drop in the company, position, salary range, and a link to the listing the moment you find something worth applying to.</p>
+      </div>
+      <div class="how-step">
+        <div class="idx">2</div>
+        <h3>Move it forward</h3>
+        <p>Drag each card from Wish List to Applied to Interviewing as things progress — the board always shows exactly where you stand.</p>
+      </div>
+      <div class="how-step">
+        <div class="idx">3</div>
+        <h3>Land the offer</h3>
+        <p>Keep notes, tags and interview details attached to every card so nothing gets lost between rounds.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="features-wrap">
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C8940" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7"/><path d="M3 12h18"/></svg>
+        </div>
+        <h3>Organize applications</h3>
+        <p>Create custom boards and columns to track every application at every stage of the process.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C8940" stroke-width="1.8"><path d="M4 19h16"/><path d="m5 15 4-5 3 3 6-8"/></svg>
+        </div>
+        <h3>Track progress</h3>
+        <p>Move applications from applied to interviewing to offer on a visual board you update in seconds.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C8940" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.3 2.3L16 10"/></svg>
+        </div>
+        <h3>Stay organized</h3>
+        <p>Never lose track of an application again — keep every detail in one centralized place.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C8940" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h7"/></svg>
+        </div>
+        <h3>Tags and notes</h3>
+        <p>Attach skill tags, salary details and personal notes to any card so context travels with the role.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C8940" stroke-width="1.8"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="15" width="7" height="7" rx="1.5"/><rect x="14" y="15" width="7" height="7" rx="1.5"/></svg>
+        </div>
+        <h3>Multiple boards</h3>
+        <p>Run a separate board for a career pivot, a specific industry, or a location — as many as you need.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C8940" stroke-width="1.8"><path d="M12 8v4l2.5 2.5"/><circle cx="12" cy="12" r="9"/></svg>
+        </div>
+        <h3>One-minute setup</h3>
+        <p>No onboarding flow to sit through — create an account and your first board is ready to use.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="faq">
+    <div class="faq-head">
+      <h2>Questions, answered</h2>
+      <p>Everything you'd want to know before you start.</p>
+    </div>
+    <div id="faqList">
+      <div class="faq-item open">
+        <button class="faq-q">Is Job Tracker really free?
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="faq-a">Yes — the core board, unlimited cards, and tags are free forever. No credit card is required to sign up.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Can I use more than one board?
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="faq-a">Yes. Keep a separate board per career track, industry, or location — each one has its own columns and cards.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Do I need to install anything?
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="faq-a">No — Job Tracker runs entirely in the browser, so it works the same on your laptop, tablet, or phone.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">What happens to my data if I stop using it?
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="faq-a">Your boards stay exactly as you left them. You can export or delete your data from account settings at any time.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="final-cta">
+    <h2>Your next offer starts with one board</h2>
+    <p>Set it up in under a minute, no credit card required.</p>
+    <a class="hero-cta" href="auth-card.html">
+      Start for free
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7C8940" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-top">
+      <a class="brand" href="landing.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="13" rx="2" stroke="#B7C179" stroke-width="1.8"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7" stroke="#B7C179" stroke-width="1.8"/><path d="M3 12h18" stroke="#B7C179" stroke-width="1.8"/></svg>
+        Job Tracker
+      </a>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="landing.html#preview">How it works</a>
+        <a href="auth-card.html">Start for free</a>
+        <a href="auth-card.html#login">Log in</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Job Tracker. All rights reserved.</span>
+      <span>Made for people who are tired of spreadsheets.</span>
+    </div>
+  </footer>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.tab');
+  const caption = document.getElementById('tabCaption');
+  const panels = document.querySelectorAll('.preview-panel');
+
+  const config = {
+    organize: {
+      caption: 'Every application lives on one board, sorted into the stages that matter to you.'
+    },
+    hired: {
+      caption: 'See every role\u2019s salary, tags and notes right on the card as it moves toward an offer.'
+    },
+    manage: {
+      caption: 'Add a new application in seconds with a simple form — company, position, tags and all.'
+    }
+  };
+
+  function setTab(name){
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    panels.forEach(p => p.classList.toggle('active', p.dataset.panel === name));
+    caption.style.opacity = 0;
+    setTimeout(() => {
+      caption.textContent = config[name].caption;
+      caption.style.opacity = 1;
+    }, 120);
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => setTab(t.dataset.tab)));
+
+  // faq accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+})();
+</script>
+</body>
+</html>

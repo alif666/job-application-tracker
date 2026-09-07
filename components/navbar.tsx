@@ -17,17 +17,17 @@ import {useSession} from "@/lib/auth/auth-client";
 export default function Navbar(){
     const {data: session} = useSession();
     return(
-        <nav className="border-b border-gray-200 bg-white">
-            <div className="container mx-auto flex h-16 items-center px-4 justify-between">
-                <Link href="/" className="flex items-center gap-2 text-xl font-semibold text-primary space-x-4">
-                    <Briefcase/>
+        <nav className="sticky top-0 z-50 border-b border-white/60 bg-white/60 backdrop-blur-xl">
+            <div className="container mx-auto flex h-[4.5rem] items-center justify-between px-5 sm:px-8">
+                <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-[#1b1d29]">
+                    <Briefcase className="size-5 text-[#b7c179]"/>
                     Job Tracker
                 </Link>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-5">
                     {session?.user ?
                         <>
                             <Link href="/dashboard">
-                                <Button variant ="ghost" className="text-gray-700 hover:text-black">
+                                <Button variant ="ghost" className="font-semibold text-[#1b1d29] hover:bg-[#f3f5e7] hover:text-[#7c8940]">
                                     Dashboard
                                 </Button>
                             </Link>
@@ -61,12 +61,12 @@ export default function Navbar(){
                         :
                         <>
                             <Link href="sign-in">
-                                <Button variant="ghost" className="text-gray-700 hover:text-black">
+                                <Button variant="ghost" className="font-semibold text-[#1b1d29] hover:bg-[#f3f5e7] hover:text-[#7c8940]">
                                     Log In
                                 </Button>
                             </Link>
                             <Link href="/sign-up">
-                                <Button>
+                                <Button className="h-auto rounded-lg bg-[#b7c179] px-4 py-2 font-bold text-white hover:bg-[#94a15a]">
                                     Start for Free
                                 </Button>
                             </Link>
