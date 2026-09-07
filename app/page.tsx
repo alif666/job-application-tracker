@@ -24,7 +24,8 @@ export default function Home() {
                 <ArrowRight className="ml-2"/>
               </Button>
             </Link>
-            <p>Free forever. No credit card required</p>
+            <p>Free forever. No credit card required.</p>
+            <p className="italic text-sm">For demo use aliflodithree@gmail.com/aliflodi</p>
           </div>
         </section>
       {/* Hero Images Section with Tabs */}
